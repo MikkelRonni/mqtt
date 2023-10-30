@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>MQTT Data</title>
+</head>
+<body>
+    <h1>Real-time MQTT Data</h1>
+    <ul id="data-list"></ul>
+    <script>
+        var mqttClient = new Paho.MQTT.Client("mosquittobroker.westeurope.azurecontainer.io", Number(1883), "web_client");
+        
+        mqttClient.onConnectionLost = function(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("Connection lost: " + responseObject.errorMessage);
+            }
+        };
+
+        mqttClient.onMessageArrived = function(message) {
+            var data = JSON.parse(message.payloadString);
+            var dataList = document.getElementById("data-list");
+            var listItem = document.createElement("li");
+            listItem.textContent = "Topic: " + message.destinationName + " - Data: " + message.payloadString;
+            dataList.appendChild(listItem);
+        };
+
+        mqttClient.connect({ onSuccess: onConnect });
+
+        function onConnect() {
+            mqttClient.subscribe("MIR/temp");
+            mqttClient.subscribe("MIR/humi");
+        }
+    </script>
+</body>
+</html>
