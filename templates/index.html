@@ -1,33 +1,49 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>MQTT Data</title>
+    <title>MQTT Real-Time Data</title>
+    <style>
+        .data-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Real-time MQTT Data</h1>
-    <ul id="data-list"></ul>
+    <h1>Real-Time Data from MQTT Broker</h1>
+    <p id="mqtt-connected"></p>
+
+    <div class="data-box">
+        <h2>MIR/temp Data:</h2>
+        <p id="temp-data">{{ mqtt_data.get('MIR/temp', 'No data available') }}</p>
+    </div>
+
+    <div class="data-box">
+        <h2>MIR/humi Data:</h2>
+        <p id="humi-data">{{ mqtt_data.get('MIR/humi', 'No data available') }}</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
     <script>
-        var mqttClient = new Paho.MQTT.Client("mosquittobroker.westeurope.azurecontainer.io", Number(1883), "web_client");
-        
-        mqttClient.onConnectionLost = function(responseObject) {
-            if (responseObject.errorCode !== 0) {
-                console.log("Connection lost: " + responseObject.errorMessage);
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            socket.emit('connect');
+        });
+
+        socket.on('mqtt_connected', function(data) {
+            document.getElementById('mqtt-connected').innerHTML = data.data;
+        });
+
+        socket.on('mqtt_message', function(data) {
+            var topic = data.topic;
+            var dataElement = document.getElementById(topic + '-data');
+            if (dataElement) {
+                dataElement.innerHTML = data.data;
             }
-        };
-
-        mqttClient.onMessageArrived = function(message) {
-            var data = JSON.parse(message.payloadString);
-            var dataList = document.getElementById("data-list");
-            var listItem = document.createElement("li");
-            listItem.textContent = "Topic: " + message.destinationName + " - Data: " + message.payloadString;
-            dataList.appendChild(listItem);
-        };
-
-        mqttClient.connect({ onSuccess: onConnect });
-
-        function onConnect() {
-            mqttClient.subscribe("MIR/temp");
-            mqttClient.subscribe("MIR/humi");
-        }
+        });
     </script>
 </body>
 </html>
