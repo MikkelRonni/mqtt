@@ -27,8 +27,7 @@ mqtt_client.loop_start()  # Start the MQTT client loop
 @socketio.on('connect')
 def handle_connect():
     for topic in mqtt_topics:
-        mqtt_client.subscribe(topic)
-    socketio.emit('mqtt_connected', {'data': 'Connected to MQTT broker'})
+        socketio.emit('mqtt_connected', {'data': 'Connected to MQTT broker'})
 
 @app.route('/')
 def index():

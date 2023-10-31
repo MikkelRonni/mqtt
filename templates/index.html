@@ -12,16 +12,16 @@
     </style>
 </head>
 <body>
-    <h1>Real-Time Data from MQTT Broker</h1>
+    <h1>Data fra MQTT broker</h1>
     <p id="mqtt-connected"></p>
 
     <div class="data-box">
-        <h2>MIR/temp Data:</h2>
+        <h2>Temperatur:</h2>
         <p id="temp-data">{{ mqtt_data.get('MIR/temp', 'No data available') }}</p>
     </div>
 
     <div class="data-box">
-        <h2>MIR/humi Data:</h2>
+        <h2>Luftfugtighed:</h2>
         <p id="humi-data">{{ mqtt_data.get('MIR/humi', 'No data available') }}</p>
     </div>
 
